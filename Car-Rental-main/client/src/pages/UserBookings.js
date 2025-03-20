@@ -30,6 +30,7 @@ import {
 } from "@ant-design/icons";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import RatingsDashboard from "../components/RatingsDashboard";
 
 const { Title, Text } = Typography;
 
@@ -315,6 +316,10 @@ function UserBookings() {
                 </Empty>
               </Card>
             )}
+          </Col>
+
+          <Col lg={6} sm={24}>
+            <RatingsDashboard />
           </Col>
         </Row>
       </div>

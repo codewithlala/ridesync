@@ -8,9 +8,35 @@ The Car Rental project is a comprehensive MERN stack web application tailored fo
 - Booking management system for efficient rental services.
 - Admin dashboard with specialized features for company management.
 
+## New Features
+
+### Customer Ratings and Feedback System
+
+We've implemented a comprehensive car rating and feedback system that allows users to:
+
+1. **Rate Cars**: After completing a booking, users can rate their car rental experience on a 5-star scale.
+2. **Leave Feedback**: Users can provide detailed comments about their experience.
+3. **View Car Ratings**: All cars display their average rating in the car list and detail views.
+4. **View Feedback Statistics**: A new dashboard shows overall rating statistics, distribution, and top-rated cars.
+
+#### Implementation Details:
+
+- **Feedback Form**: After successful payment, users have the option to rate the car.
+- **Rating Storage**: All ratings are stored in the browser's localStorage for persistence.
+- **Car Preview**: Added a car preview feature to see more details before booking.
+- **Rating Indicators**: Cars with feedback have additional indicators in the listings.
+- **Rating Dashboard**: A summary dashboard on the user's bookings page shows rating statistics.
+
+### Other Improvements
+
+- Changed currency symbol from $ to ₹ for the Indian market
+- Fixed fuel type filtering to handle different casing formats
+- Added proper error handling in various components
+- Improved the UI/UX with detailed car previews and better feedback
+
 ## Live Link
 
-[Click here to visit Car Rental](<https://car-rental-p1wz.vercel.app/>)
+[Click here to visit Car Rental](https://car-rental-p1wz.vercel.app/)
 
 ## How to Use
 

@@ -14,6 +14,7 @@ import {
   Statistic,
   Alert,
   Image,
+  Result,
 } from "antd";
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -25,8 +26,9 @@ import { bookCar } from "../redux/actions/bookingActions";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import StripePaymentForm from "../components/StripePaymentForm";
+import FeedbackForm from "../components/FeedbackForm";
 import AOS from "aos";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import {
   CarOutlined,
   CalendarOutlined,
@@ -36,6 +38,7 @@ import {
   ClockCircleOutlined,
   CheckCircleOutlined,
   CreditCardOutlined,
+  StarOutlined,
 } from "@ant-design/icons";
 
 import "aos/dist/aos.css";
@@ -50,6 +53,7 @@ const { Title, Text, Paragraph } = Typography;
 
 function BookingCar() {
   const match = useLoaderData();
+  const navigate = useNavigate();
   const { cars } = useSelector((state) => state.carsReducer);
   const { loading } = useSelector((state) => state.alertsReducer);
   const [car, setCar] = useState({});
@@ -61,6 +65,9 @@ function BookingCar() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
+  const [paymentComplete, setPaymentComplete] = useState(false);
+  const [currentBooking, setCurrentBooking] = useState(null);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
 
   useEffect(() => {
     if (cars.length == 0) {
@@ -90,21 +97,86 @@ function BookingCar() {
     }
   }
 
-  function handlePaymentSuccess(token) {
-    const reqObj = {
-      token,
-      user: JSON.parse(localStorage.getItem("user"))._id,
-      car: car._id,
-      totalHours,
-      totalAmount,
-      driverRequired: driver,
-      bookedTimeSlots: {
-        from,
-        to,
-      },
-    };
+  const handlePaymentSuccess = (paymentIntent) => {
+    setPaymentComplete(true);
 
-    dispatch(bookCar(reqObj));
+    // Create booking object for feedback
+    setCurrentBooking({
+      _id: paymentIntent.id, // Use the payment intent ID as the booking ID
+      car: car,
+      totalHours: totalHours,
+      totalAmount: totalAmount,
+      bookedTimeSlots: {
+        from: from,
+        to: to,
+      },
+      transactionId: paymentIntent.id,
+    });
+  };
+
+  const handleViewBookings = () => {
+    navigate("/userbookings");
+  };
+
+  const handleGiveFeedback = () => {
+    setShowFeedbackForm(true);
+  };
+
+  const handleFeedbackClose = () => {
+    setShowFeedbackForm(false);
+    navigate("/userbookings");
+  };
+
+  // If payment is complete, show the success screen
+  if (paymentComplete) {
+    return (
+      <DefaultLayout>
+        {showFeedbackForm ? (
+          <div className="feedback-container" style={{ padding: "30px 0" }}>
+            <Row justify="center" gutter={[24, 24]}>
+              <Col xs={24} lg={16}>
+                <FeedbackForm
+                  booking={currentBooking}
+                  onClose={handleFeedbackClose}
+                />
+              </Col>
+            </Row>
+          </div>
+        ) : (
+          <div className="success-container" style={{ padding: "50px 0" }}>
+            <Row justify="center" gutter={[24, 24]}>
+              <Col xs={24} lg={16}>
+                <Result
+                  status="success"
+                  title="Your car booking was successful!"
+                  subTitle={`Transaction ID: ${currentBooking?.transactionId}. You have booked ${car.name} from ${from} to ${to}.`}
+                  extra={[
+                    <Button
+                      key="bookings"
+                      type="primary"
+                      onClick={handleViewBookings}
+                      style={{
+                        background: "slateblue",
+                        borderColor: "slateblue",
+                      }}
+                    >
+                      View My Bookings
+                    </Button>,
+                    <Button
+                      key="feedback"
+                      onClick={handleGiveFeedback}
+                      icon={<StarOutlined />}
+                    >
+                      Give Feedback
+                    </Button>,
+                  ]}
+                />
+              </Col>
+            </Row>
+          </div>
+        )}
+      </DefaultLayout>
+    );
   }
 
   return (
@@ -194,7 +266,7 @@ function BookingCar() {
                             span={1}
                           >
                             <Tag color="green" style={{ fontSize: "16px" }}>
-                              ${car.rentPerHour}
+                              ₹{car.rentPerHour}
                             </Tag>
                           </Descriptions.Item>
                           <Descriptions.Item
@@ -258,7 +330,7 @@ function BookingCar() {
                                 }}
                                 style={{ marginBottom: "15px" }}
                               >
-                                <Text strong>Include Driver (+$30/hr)</Text>
+                                <Text strong>Include Driver (+₹30/hr)</Text>
                               </Checkbox>
 
                               <Divider style={{ margin: "15px 0" }} />
