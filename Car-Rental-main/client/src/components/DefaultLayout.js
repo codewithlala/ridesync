@@ -10,10 +10,7 @@ function DefaultLayout(props) {
       key: "home",
       label: <a href="/">Home</a>,
     },
-    {
-      key: "bookings",
-      label: <a href="/userbookings">Bookings</a>,
-    },
+    
     {
       key: "admin",
       label: <a href="/admin">Admin</a>,
