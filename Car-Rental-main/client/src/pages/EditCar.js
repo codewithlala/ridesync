@@ -1,12 +1,12 @@
-import { Col, Row, Form, Input } from "antd";
+import { Col, Row, Form, Input, Select } from "antd";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import DefaultLayout from "../components/DefaultLayout";
 import Spinner from "../components/Spinner";
 import { addCar, editCar, getAllCars } from "../redux/actions/carsActions";
-import {
-  useLoaderData,
-} from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
+
+const { Option } = Select;
 
 function EditCar() {
   const match = useLoaderData();
@@ -36,7 +36,7 @@ function EditCar() {
     <DefaultLayout>
       {loading && <Spinner />}
       <Row justify="center mt-5">
-        <Col lg={12} sm={24} xs={24} className='p-2'>
+        <Col lg={12} sm={24} xs={24} className="p-2">
           {totalcars.length > 0 && (
             <Form
               initialValues={car}
@@ -81,6 +81,19 @@ function EditCar() {
                 rules={[{ required: true }]}
               >
                 <Input />
+              </Form.Item>
+              <Form.Item
+                name="carType"
+                label="Car Type"
+                rules={[{ required: true }]}
+              >
+                <Select placeholder="Select car type">
+                  <Option value="sedan">Sedan</Option>
+                  <Option value="suv">SUV</Option>
+                  <Option value="luxury">Luxury</Option>
+                  <Option value="sports">Sports</Option>
+                  <Option value="Electric">Electric</Option>
+                </Select>
               </Form.Item>
 
               <div className="text-right">

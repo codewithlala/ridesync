@@ -10,8 +10,16 @@ export const userLogin = (reqObj) => async (dispatch) => {
     localStorage.setItem("user", JSON.stringify(response.data));
     message.success("Login success");
     dispatch({ type: "LOADING", payload: false });
+
+    // Check if user is admin and redirect accordingly
+    const user = response.data;
+
     setTimeout(() => {
-      window.location.href = "/";
+      if (user.isAdmin) {
+        window.location.href = "/admin"; // Redirect admin to admin dashboard
+      } else {
+        window.location.href = "/"; // Redirect regular users to home
+      }
     }, 500);
   } catch (error) {
     console.log(error);
