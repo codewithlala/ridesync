@@ -9,6 +9,7 @@ import UserBookings from "./pages/UserBookings";
 import AddCar from "./pages/AddCar";
 import AdminHome from "./pages/AdminHome";
 import EditCar from "./pages/EditCar";
+import LandingPage from "./pages/LandingPage";
 
 export const ProtectedRoute = ({ children }) => {
   if (localStorage.getItem("user")) {
@@ -31,6 +32,10 @@ export const AdminRoute = ({ children }) => {
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <LandingPage />,
+  },
+  {
+    path: "/home",
     element: (
       <ProtectedRoute>
         <Home />

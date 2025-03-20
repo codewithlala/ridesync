@@ -94,7 +94,7 @@ function DefaultLayout(props) {
     {
       key: "home",
       label: (
-        <Link to="/" className="menu-item">
+        <Link to="/home" className="menu-item">
           <HomeOutlined className="menu-icon" /> Home
         </Link>
       ),
@@ -177,7 +177,7 @@ function DefaultLayout(props) {
                   <CarOutlined
                     style={{ marginRight: "10px", fontSize: "28px" }}
                   />
-                  Car Rental
+                  RideSync Services
                 </Title>
               </Link>
             </Col>
@@ -264,7 +264,7 @@ function DefaultLayout(props) {
                 Quick Links
               </Title>
               <div className="footer-links">
-                <Link to="/">Home</Link>
+                <Link to="/home">Home</Link>
                 <Divider type="vertical" />
                 <Link to="/userbookings">My Bookings</Link>
                 <Divider type="vertical" />

@@ -18,7 +18,7 @@ export const userLogin = (reqObj) => async (dispatch) => {
       if (user.isAdmin) {
         window.location.href = "/admin"; // Redirect admin to admin dashboard
       } else {
-        window.location.href = "/"; // Redirect regular users to home
+        window.location.href = "/home"; // Redirect regular users to home
       }
     }, 500);
   } catch (error) {
