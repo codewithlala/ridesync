@@ -22,7 +22,9 @@ import Spinner from "../components/Spinner";
 import { getAllCars } from "../redux/actions/carsActions";
 import moment from "moment";
 import { bookCar } from "../redux/actions/bookingActions";
-import StripeCheckout from "react-stripe-checkout";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import StripePaymentForm from "../components/StripePaymentForm";
 import AOS from "aos";
 import { useLoaderData } from "react-router-dom";
 import {
@@ -37,6 +39,11 @@ import {
 } from "@ant-design/icons";
 
 import "aos/dist/aos.css";
+
+// Load Stripe
+const stripePromise = loadStripe(
+  "pk_test_51R3D0hDkXFDdQgJnWQNm1KPWmyI9MPI3uKB7dpaO0UQZfxqT8LPooJf7ACMcnEghMJD3TLh783dWbE7Mfr5rJ3PR00AsSKatLg"
+);
 
 const { RangePicker } = DatePicker;
 const { Title, Text, Paragraph } = Typography;
@@ -53,6 +60,7 @@ function BookingCar() {
   const [driver, setDriver] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
 
   useEffect(() => {
     if (cars.length == 0) {
@@ -82,7 +90,7 @@ function BookingCar() {
     }
   }
 
-  function onToken(token) {
+  function handlePaymentSuccess(token) {
     const reqObj = {
       token,
       user: JSON.parse(localStorage.getItem("user"))._id,
@@ -272,18 +280,13 @@ function BookingCar() {
                                 className="checkout-button"
                                 style={{ marginTop: "20px" }}
                               >
-                                <StripeCheckout
-                                  shippingAddress
-                                  token={onToken}
-                                  currency="inr"
-                                  amount={totalAmount * 100}
-                                  stripeKey="pk_test_51R3D0hDkXFDdQgJnWQNm1KPWmyI9MPI3uKB7dpaO0UQZfxqT8LPooJf7ACMcnEghMJD3TLh783dWbE7Mfr5rJ3PR00AsSKatLg"
-                                >
+                                {!showPayment ? (
                                   <Button
                                     type="primary"
                                     size="large"
                                     icon={<CreditCardOutlined />}
                                     block
+                                    onClick={() => setShowPayment(true)}
                                     style={{
                                       height: "50px",
                                       fontSize: "16px",
@@ -291,9 +294,20 @@ function BookingCar() {
                                       borderColor: "slateblue",
                                     }}
                                   >
-                                    Book Now
+                                    Proceed to Payment
                                   </Button>
-                                </StripeCheckout>
+                                ) : (
+                                  <div className="payment-form-container">
+                                    <Divider>Secure Payment</Divider>
+                                    <Elements stripe={stripePromise}>
+                                      <StripePaymentForm
+                                        amount={totalAmount}
+                                        onSuccess={handlePaymentSuccess}
+                                        buttonText="Book Now"
+                                      />
+                                    </Elements>
+                                  </div>
+                                )}
                               </div>
                             </Card>
                           </>

@@ -10,40 +10,69 @@ const stripe = require("stripe")(
 router.post("/bookcar", async (req, res) => {
   const { token } = req.body;
   try {
+    // Create a payment method using the token from Stripe Elements
+    const paymentMethod = await stripe.paymentMethods.retrieve(token.id);
+
+    // Create a new customer if one doesn't exist
     const customer = await stripe.customers.create({
-      email: token.email,
-      source: token.id,
+      email: token.email || "customer@example.com",
+      payment_method: paymentMethod.id,
     });
 
-    const payment = await stripe.charges.create(
-      {
-        amount: req.body.totalAmount * 100,
-        currency: "INR",
-        customer: customer.id,
-        receipt_email: token.email
+    // Create payment intent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(req.body.totalAmount * 100), // convert to cents
+      currency: "inr",
+      customer: customer.id,
+      payment_method: paymentMethod.id,
+      confirm: true, // confirm the payment immediately
+      description: `Car Rental - ${req.body.totalHours} hours`,
+      receipt_email: token.email || customer.email,
+      metadata: {
+        carId: req.body.car,
+        userId: req.body.user,
+        hours: req.body.totalHours,
       },
-      {
-        idempotencyKey: uuidv4(),
+    });
 
-      }
-    );
+    if (paymentIntent.status === "succeeded") {
+      // Save transaction ID from payment intent
+      req.body.transactionId = paymentIntent.id;
 
-    if (payment) {
-    req.body.transactionId = token.id; //payment.source.id;
-    const newbooking = new Booking(req.body);
-    await newbooking.save();
-    const car = await Car.findOne({ _id: req.body.car });
-    console.log(req.body.car);
-    car.bookedTimeSlots.push(req.body.bookedTimeSlots);
+      // Create booking record
+      const newbooking = new Booking(req.body);
+      await newbooking.save();
 
-    await car.save();
-    res.send("Your booking is successfull");
+      // Update car booking slots
+      const car = await Car.findOne({ _id: req.body.car });
+      car.bookedTimeSlots.push(req.body.bookedTimeSlots);
+      await car.save();
+
+      // Return success response with booking and payment details
+      res.status(200).json({
+        success: true,
+        message: "Your booking is successful",
+        booking: newbooking,
+        paymentIntent: {
+          id: paymentIntent.id,
+          status: paymentIntent.status,
+          amount: paymentIntent.amount / 100, // convert back to original currency
+        },
+      });
     } else {
-      return res.status(400).json(error);
+      return res.status(400).json({
+        success: false,
+        message: "Payment was not successful",
+        status: paymentIntent.status,
+      });
     }
   } catch (error) {
     console.log(error);
-    return res.status(400).json(error);
+    return res.status(400).json({
+      success: false,
+      message: "There was an error processing your payment",
+      error: error.message,
+    });
   }
 });
 
