@@ -19,10 +19,6 @@ import {
   Alert,
   Tooltip,
   Statistic,
-  Modal,
-  Descriptions,
-  Space,
-  Avatar,
 } from "antd";
 import { Link } from "react-router-dom";
 import Spinner from "../components/Spinner";
@@ -38,15 +34,8 @@ import {
   FilterOutlined,
   DollarOutlined,
   ClockCircleOutlined,
-  InfoCircleOutlined,
-  StarOutlined,
-  CommentOutlined,
+  UnorderedListOutlined,
 } from "@ant-design/icons";
-import {
-  getCarRating,
-  hasCarFeedback,
-  getAllCarRatings,
-} from "../utils/carRatings";
 
 const { RangePicker } = DatePicker;
 const { Title, Text, Paragraph } = Typography;
@@ -55,7 +44,7 @@ const { Option } = Select;
 function Home() {
   const { cars } = useSelector((state) => state.carsReducer);
   const { loading } = useSelector((state) => state.alertsReducer);
-  const [totalCars, setTotalcars] = useState([]);
+  const [totalCars, setTotalCars] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [priceFilter, setPriceFilter] = useState("all");
   const [capacityFilter, setCapacityFilter] = useState("all");
@@ -63,9 +52,8 @@ function Home() {
   const [carTypeFilter, setCarTypeFilter] = useState("all");
   const [filteredCars, setFilteredCars] = useState([]);
   const [dateRange, setDateRange] = useState(null);
-  const [carRatings, setCarRatings] = useState({});
-  const [previewVisible, setPreviewVisible] = useState(false);
-  const [selectedCar, setSelectedCar] = useState(null);
+  const [viewType, setViewType] = useState("list");
+  const [showModal, setShowModal] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -73,14 +61,11 @@ function Home() {
     AOS.init({
       duration: 1000,
     });
-
-    // Load car ratings using the utility function
-    setCarRatings(getAllCarRatings());
   }, [dispatch]);
 
   useEffect(() => {
     if (cars && cars.length > 0) {
-      setTotalcars(cars);
+      setTotalCars(cars);
       setFilteredCars(cars);
     }
   }, [cars]);
@@ -97,18 +82,6 @@ function Home() {
     fuelTypeFilter,
     carTypeFilter,
   ]);
-
-  // Function to open car preview modal
-  const showCarPreview = (car) => {
-    setSelectedCar(car);
-    setPreviewVisible(true);
-  };
-
-  // Function to close car preview modal
-  const handlePreviewClose = () => {
-    setPreviewVisible(false);
-    setSelectedCar(null);
-  };
 
   // Function to handle time range selection
   const setFilter = (values) => {
@@ -390,7 +363,7 @@ function Home() {
 
                         <Button
                           type="primary"
-                          icon={<FilterOutlined />}
+                          icon={<FilterOutlined style={{ border: "none" }} />}
                           onClick={resetFilters}
                           style={{ marginLeft: "auto" }}
                         >
@@ -509,14 +482,6 @@ function Home() {
                           suffix="/hr"
                           valueStyle={{ fontSize: "16px", color: "#3f8600" }}
                         />,
-                        <Button
-                          type="default"
-                          size="small"
-                          icon={<InfoCircleOutlined />}
-                          onClick={() => showCarPreview(car)}
-                        >
-                          Preview
-                        </Button>,
                         <Link to={`/booking/${car._id}`}>
                           <Button
                             type="primary"
@@ -540,18 +505,11 @@ function Home() {
                           <div className="car-meta">
                             <div style={{ marginBottom: "8px" }}>
                               <Rate
-                                defaultValue={getCarRating(car._id)}
+                                defaultValue={0}
                                 disabled
                                 allowHalf
-                                style={{ fontSize: "14px" }}
+                                style={{ fontSize: "14px", display: "none" }}
                               />
-                              {hasCarFeedback(car._id) && (
-                                <Tooltip title="Has customer feedback">
-                                  <CommentOutlined
-                                    style={{ marginLeft: 8, color: "#1890ff" }}
-                                  />
-                                </Tooltip>
-                              )}
                             </div>
 
                             <div
@@ -561,12 +519,21 @@ function Home() {
                                 marginBottom: "8px",
                               }}
                             >
-                              <Tag color="blue" icon={<UserOutlined />}>
+                              <Tag
+                                color="blue"
+                                icon={
+                                  <UserOutlined style={{ border: "none" }} />
+                                }
+                              >
                                 {car.capacity} Seats
                               </Tag>
                               <Tag
                                 color="volcano"
-                                icon={<EnvironmentOutlined />}
+                                icon={
+                                  <EnvironmentOutlined
+                                    style={{ border: "none" }}
+                                  />
+                                }
                               >
                                 {car.fuelType}
                               </Tag>
@@ -593,123 +560,24 @@ function Home() {
         </Row>
       </div>
 
-      {/* Car Preview Modal */}
-      <Modal
-        visible={previewVisible}
-        title={selectedCar?.name || "Car Details"}
-        onCancel={handlePreviewClose}
-        footer={[
-          <Button key="close" onClick={handlePreviewClose}>
-            Close
-          </Button>,
-          <Link
-            key="book"
-            to={selectedCar ? `/booking/${selectedCar._id}` : "#"}
-          >
-            <Button
-              type="primary"
-              style={{ background: "slateblue", borderColor: "slateblue" }}
-            >
-              Book Now
-            </Button>
-          </Link>,
-        ]}
-        width={800}
-      >
-        {selectedCar && (
-          <Row gutter={[24, 24]}>
-            <Col xs={24} md={12}>
-              <img
-                src={selectedCar.image}
-                alt={selectedCar.name}
-                style={{ width: "100%", borderRadius: "8px" }}
-              />
-
-              <div style={{ marginTop: 16 }}>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <StarOutlined style={{ color: "#faad14", marginRight: 8 }} />
-                  <Rate
-                    value={getCarRating(selectedCar._id)}
-                    disabled
-                    allowHalf
-                    style={{ fontSize: "16px" }}
-                  />
-                  <Text style={{ marginLeft: 8 }}>
-                    {getCarRating(selectedCar._id).toFixed(1)}
-                  </Text>
-                </div>
-
-                {hasCarFeedback(selectedCar._id) && (
-                  <Card size="small" style={{ marginTop: 8 }}>
-                    <Text type="secondary" style={{ fontSize: "12px" }}>
-                      Customer Review:
-                    </Text>
-                    <Paragraph style={{ margin: "8px 0 0" }}>
-                      "{carRatings[selectedCar._id]?.comment || "Great car!"}"
-                    </Paragraph>
-                  </Card>
-                )}
-              </div>
-            </Col>
-
-            <Col xs={24} md={12}>
-              <Descriptions title="Car Information" layout="vertical" bordered>
-                <Descriptions.Item label="Name" span={3}>
-                  <Text strong>{selectedCar.name}</Text>
-                </Descriptions.Item>
-                <Descriptions.Item label="Fuel Type">
-                  <Tag color="volcano">{selectedCar.fuelType}</Tag>
-                </Descriptions.Item>
-                <Descriptions.Item label="Capacity">
-                  <Tag color="blue">{selectedCar.capacity} Persons</Tag>
-                </Descriptions.Item>
-                <Descriptions.Item label="Car Type">
-                  <Tag color="cyan">{selectedCar.carType || "N/A"}</Tag>
-                </Descriptions.Item>
-                <Descriptions.Item label="Rent per Hour" span={3}>
-                  <Statistic
-                    value={selectedCar.rentPerHour}
-                    prefix="₹"
-                    suffix="/hour"
-                    valueStyle={{ color: "#3f8600", fontSize: "18px" }}
-                  />
-                </Descriptions.Item>
-
-                <Descriptions.Item label="Availability" span={3}>
-                  {selectedCar.bookedTimeSlots &&
-                  selectedCar.bookedTimeSlots.length > 0 ? (
-                    <div>
-                      <Text type="secondary">Currently booked for:</Text>
-                      <div style={{ marginTop: 8 }}>
-                        {selectedCar.bookedTimeSlots.map((slot, index) => (
-                          <div key={index} style={{ marginBottom: 8 }}>
-                            <Tag color="red">
-                              <ClockCircleOutlined /> {slot.from} → {slot.to}
-                            </Tag>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <Tag color="green">Available (No current bookings)</Tag>
-                  )}
-                </Descriptions.Item>
-              </Descriptions>
-
-              <div style={{ marginTop: 24 }}>
-                <Text strong>Why choose this car?</Text>
-                <Paragraph style={{ margin: "8px 0 0" }}>
-                  This {selectedCar.name} offers excellent performance and
-                  comfort. With {selectedCar.capacity} seats and{" "}
-                  {selectedCar.fuelType} engine, it's perfect for{" "}
-                  {selectedCar.capacity > 4 ? "family trips" : "city commuting"}
-                  .
-                </Paragraph>
-              </div>
-            </Col>
-          </Row>
-        )}
-      </Modal>
+      <div className="d-flex justify-content-between">
+        <Button onClick={setFilter}>
+          <FilterOutlined style={{ border: "none" }} /> Filter
+        </Button>
+        <Button onClick={() => setShowModal(true)}>
+          <UserOutlined style={{ border: "none" }} /> Your Favorites
+        </Button>
+        <Button
+          onClick={() => setViewType(viewType === "map" ? "list" : "map")}
+        >
+          {viewType === "map" ? (
+            <UnorderedListOutlined style={{ border: "none" }} />
+          ) : (
+            <EnvironmentOutlined style={{ border: "none" }} />
+          )}
+          {viewType === "map" ? " List View" : " Map View"}
+        </Button>
+      </div>
     </DefaultLayout>
   );
 }

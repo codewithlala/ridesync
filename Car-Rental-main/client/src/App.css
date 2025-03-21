@@ -1,3 +1,72 @@
+/* Global styles to remove borders from icons */
+.anticon {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.ant-btn .anticon {
+  border: none !important;
+}
+
+/* Remove borders from icon-only buttons */
+.ant-btn-icon-only {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* For buttons with icons, ensure the icons don't have borders */
+button .anticon {
+  border: none !important;
+}
+
+/* For rate component icons */
+.ant-rate-star,
+.ant-rate-star-first,
+.ant-rate-star-second {
+  border: none !important;
+}
+
+/* For timeline component icons */
+.ant-timeline-item-head .anticon {
+  border: none !important;
+}
+
+/* For statistic component icons */
+.ant-statistic .anticon {
+  border: none !important;
+}
+
+/* For tag component icons */
+.ant-tag .anticon {
+  border: none !important;
+}
+
+/* For menu component icons */
+.ant-menu-item .anticon {
+  border: none !important;
+}
+
+/* For dropdown component icons */
+.ant-dropdown-menu-item .anticon {
+  border: none !important;
+}
+
+/* For message component icons */
+.ant-message .anticon {
+  border: none !important;
+}
+
+/* For alert component icons */
+.ant-alert .anticon {
+  border: none !important;
+}
+
+/* For all buttons with icons */
+.ant-btn {
+  box-shadow: none !important;
+}
+
 .App {
   text-align: center;
 }

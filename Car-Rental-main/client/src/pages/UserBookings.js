@@ -21,16 +21,14 @@ import moment from "moment";
 import {
   CarOutlined,
   ClockCircleOutlined,
-  DollarOutlined,
   CalendarOutlined,
-  EnvironmentOutlined,
-  CheckCircleOutlined,
   CreditCardOutlined,
   UserOutlined,
+  StarOutlined,
+  StarFilled,
 } from "@ant-design/icons";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import RatingsDashboard from "../components/RatingsDashboard";
 
 const { Title, Text } = Typography;
 
@@ -238,10 +236,9 @@ function UserBookings() {
                             <Tag color="blue">{booking.totalHours} hours</Tag>
                           </div>
                           <div style={{ marginBottom: "8px" }}>
-                            <DollarOutlined style={{ marginRight: "8px" }} />
                             <Text strong>Rate:</Text>{" "}
                             <Tag color="purple">
-                              ${booking.car.rentPerHour}/hr
+                              ₹{booking.car.rentPerHour}/hr
                             </Tag>
                           </div>
                           <div style={{ marginBottom: "8px" }}>
@@ -316,10 +313,6 @@ function UserBookings() {
                 </Empty>
               </Card>
             )}
-          </Col>
-
-          <Col lg={6} sm={24}>
-            <RatingsDashboard />
           </Col>
         </Row>
       </div>

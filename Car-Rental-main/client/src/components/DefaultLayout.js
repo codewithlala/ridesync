@@ -194,51 +194,24 @@ function DefaultLayout(props) {
                 alignItems: "center",
               }}
             >
-              <Tooltip
-                title={
-                  isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"
-                }
-              >
+              <div className="right">
                 <Button
-                  type="text"
-                  shape="circle"
                   onClick={toggleTheme}
-                  icon={
-                    isDarkMode ? (
-                      <BulbFilled
-                        style={{ color: "#f5c842", fontSize: "18px" }}
-                      />
-                    ) : (
-                      <BulbOutlined style={{ fontSize: "18px" }} />
-                    )
-                  }
-                  style={{ marginRight: "15px" }}
-                />
-              </Tooltip>
-
-              <Dropdown
-                overlay={menu}
-                placement="bottomRight"
-                arrow
-                trigger={["click"]}
-              >
-                <Badge dot={user.isAdmin} color="green">
-                  <Button
-                    type="text"
-                    shape="circle"
-                    size="large"
-                    icon={
-                      <Avatar
-                        style={{
-                          backgroundColor: user.isAdmin ? "#1890ff" : "#8573e5",
-                          cursor: "pointer",
-                        }}
-                        icon={<UserOutlined />}
-                      />
-                    }
-                  />
-                </Badge>
-              </Dropdown>
+                  style={{
+                    backgroundColor: "transparent",
+                    border: "none",
+                    boxShadow: "none",
+                    marginRight: 10,
+                  }}
+                >
+                  {isDarkMode ? <BulbFilled /> : <BulbOutlined />}
+                </Button>
+                <Dropdown overlay={menu} placement="bottomRight">
+                  <Button style={{ border: "none", boxShadow: "none" }}>
+                    <UserOutlined /> {user.username}
+                  </Button>
+                </Dropdown>
+              </div>
             </Col>
           </Row>
         </Header>

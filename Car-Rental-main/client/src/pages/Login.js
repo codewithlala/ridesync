@@ -1,11 +1,12 @@
 import React from "react";
-import { Row, Col, Form, Input } from "antd";
+import { Row, Col, Form, Input, Button } from "antd";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { userLogin } from "../redux/actions/userActions";
 import AOS from "aos";
 import Spinner from "../components/Spinner";
 import "aos/dist/aos.css"; // You can also use <link> for styles
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
 // ..
 AOS.init();
 function Login() {
@@ -31,8 +32,8 @@ function Login() {
         <Col lg={8} className="text-left p-5">
           <Form
             layout="vertical"
-            className="login-form p-5"
             onFinish={onFinish}
+            className="login-form p-2"
           >
             <h1>Login</h1>
             <hr />
@@ -41,20 +42,25 @@ function Login() {
               label="Username"
               rules={[{ required: true }]}
             >
-              <Input />
+              <Input
+                prefix={<UserOutlined style={{ border: "none" }} />}
+                placeholder="Enter username"
+              />
             </Form.Item>
             <Form.Item
               name="password"
               label="Password"
               rules={[{ required: true }]}
             >
-              <Input type="password" />
+              <Input.Password
+                prefix={<LockOutlined style={{ border: "none" }} />}
+                placeholder="Enter password"
+              />
             </Form.Item>
-
-            <button className="btn1 mt-2">Login</button>
-
-            <hr />
-
+            <Button type="primary" htmlType="submit" className="btn1 mt-2">
+              Login
+            </Button>
+            <br />
             <Link to="/register">Click Here to Register</Link>
           </Form>
         </Col>

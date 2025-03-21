@@ -89,15 +89,22 @@ const StripePaymentForm = ({ amount, onSuccess, buttonText = "Pay Now" }) => {
         />
       ) : (
         <>
-          <div
-            style={{
-              padding: "10px",
-              border: "1px solid #e8e8e8",
-              borderRadius: "4px",
-              marginBottom: 16,
-            }}
-          >
-            <CardElement options={CARD_ELEMENT_OPTIONS} />
+          <div style={{ margin: "20px 0" }}>
+            <h3>
+              <CreditCardOutlined style={{ border: "none" }} /> Payment Details
+            </h3>
+            <div className="stripe-container">
+              <div
+                style={{
+                  padding: "10px",
+                  border: "1px solid #e8e8e8",
+                  borderRadius: "4px",
+                  marginBottom: 16,
+                }}
+              >
+                <CardElement options={CARD_ELEMENT_OPTIONS} />
+              </div>
+            </div>
           </div>
 
           <Button

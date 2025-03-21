@@ -12,10 +12,10 @@ const carSchema = new mongoose.Schema(
         to: { type: String, required: true },
       },
     ],
-
     rentPerHour: { type: Number, required: true },
   },
   { timestamps: true }
 );
+
 const carModel = mongoose.model("cars", carSchema);
 module.exports = carModel;

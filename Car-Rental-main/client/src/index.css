@@ -1,10 +1,13 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap");
 body {
   margin: 0;
-  font-family: "Montserrat", sans-serif !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: rgb(207, 225, 225);
+  height: 100%;
 }
 body,
 html {
@@ -143,75 +146,52 @@ a {
   color: slateblue !important;
 }
 
-/* Remove borders from all icons */
+/* Global icon styles - remove all borders */
 .anticon {
   border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
-.ant-btn .anticon {
+.ant-btn .anticon,
+button .anticon,
+a .anticon {
   border: none !important;
 }
 
-button .anticon {
-  border: none !important;
-}
-
-/* Ensure icon buttons don't have visible borders */
-button.ant-btn-icon-only {
+.ant-btn-icon-only,
+.ant-btn-circle {
   border: none !important;
   box-shadow: none !important;
 }
 
-.ant-btn-icon-only:focus {
+/* Rating stars */
+.ant-rate-star,
+.ant-rate .anticon {
   border: none !important;
   outline: none !important;
 }
 
-/* Remove border from icon containers */
-.ant-avatar,
-.ant-avatar-icon {
+/* Icons in various components */
+.ant-dropdown .anticon,
+.ant-menu .anticon,
+.ant-list .anticon,
+.ant-card .anticon,
+.ant-form .anticon,
+.ant-avatar .anticon,
+.ant-table .anticon,
+.ant-tag .anticon,
+.ant-input .anticon,
+.ant-input-affix-wrapper .anticon,
+.ant-tabs .anticon,
+.ant-timeline .anticon {
   border: none !important;
 }
 
-/* Fix specific icon containers if any */
-.icon-container,
-.menu-icon,
-.social-links .anticon {
-  border: none !important;
-}
-
-/* Override any specific icon classes that might have borders */
-[class*="anticon-"] {
-  border: none !important;
-}
-
-/* Target buttons with icon-only class */
-.ant-btn-circle,
-.ant-btn-circle-outline,
-.ant-btn-icon-only {
-  border: none !important;
-}
-
-/* Remove borders from Rate component stars */
-.ant-rate-star,
-.ant-rate-star-first,
-.ant-rate-star-second {
-  border: none !important;
-}
-
-/* Ensure dropdown menu icons don't have borders */
-.ant-dropdown-menu-item .anticon,
-.ant-menu-item .anticon,
-.ant-menu-submenu-title .anticon {
-  border: none !important;
-}
-
-/* Fix for timeline icons */
-.ant-timeline-item-head .anticon {
-  border: none !important;
-}
-
-/* Remove borders from Tooltip icons */
-.ant-tooltip-open .anticon {
-  border: none !important;
+/* Remove focus borders/outlines */
+button:focus,
+.anticon:focus,
+.ant-btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
 }

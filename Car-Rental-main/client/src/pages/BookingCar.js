@@ -14,7 +14,11 @@ import {
   Statistic,
   Alert,
   Image,
-  Result,
+  Rate,
+  Timeline,
+  Avatar,
+  List,
+  Empty,
 } from "antd";
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -26,19 +30,18 @@ import { bookCar } from "../redux/actions/bookingActions";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import StripePaymentForm from "../components/StripePaymentForm";
-import FeedbackForm from "../components/FeedbackForm";
 import AOS from "aos";
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 import {
   CarOutlined,
   CalendarOutlined,
-  DollarOutlined,
   UserOutlined,
-  EnvironmentOutlined,
-  ClockCircleOutlined,
   CheckCircleOutlined,
-  CreditCardOutlined,
+  ClockCircleOutlined,
   StarOutlined,
+  EnvironmentOutlined,
+  CreditCardOutlined,
+  DollarOutlined,
 } from "@ant-design/icons";
 
 import "aos/dist/aos.css";
@@ -53,7 +56,6 @@ const { Title, Text, Paragraph } = Typography;
 
 function BookingCar() {
   const match = useLoaderData();
-  const navigate = useNavigate();
   const { cars } = useSelector((state) => state.carsReducer);
   const { loading } = useSelector((state) => state.alertsReducer);
   const [car, setCar] = useState({});
@@ -65,9 +67,7 @@ function BookingCar() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
-  const [paymentComplete, setPaymentComplete] = useState(false);
-  const [currentBooking, setCurrentBooking] = useState(null);
-  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [showRating, setShowRating] = useState(false);
 
   useEffect(() => {
     if (cars.length == 0) {
@@ -97,86 +97,21 @@ function BookingCar() {
     }
   }
 
-  const handlePaymentSuccess = (paymentIntent) => {
-    setPaymentComplete(true);
-
-    // Create booking object for feedback
-    setCurrentBooking({
-      _id: paymentIntent.id, // Use the payment intent ID as the booking ID
-      car: car,
-      totalHours: totalHours,
-      totalAmount: totalAmount,
+  function handlePaymentSuccess(token) {
+    const reqObj = {
+      token,
+      user: JSON.parse(localStorage.getItem("user"))._id,
+      car: car._id,
+      totalHours,
+      totalAmount,
+      driverRequired: driver,
       bookedTimeSlots: {
-        from: from,
-        to: to,
+        from,
+        to,
       },
-      transactionId: paymentIntent.id,
-    });
-  };
+    };
 
-  const handleViewBookings = () => {
-    navigate("/userbookings");
-  };
-
-  const handleGiveFeedback = () => {
-    setShowFeedbackForm(true);
-  };
-
-  const handleFeedbackClose = () => {
-    setShowFeedbackForm(false);
-    navigate("/userbookings");
-  };
-
-  // If payment is complete, show the success screen
-  if (paymentComplete) {
-    return (
-      <DefaultLayout>
-        {showFeedbackForm ? (
-          <div className="feedback-container" style={{ padding: "30px 0" }}>
-            <Row justify="center" gutter={[24, 24]}>
-              <Col xs={24} lg={16}>
-                <FeedbackForm
-                  booking={currentBooking}
-                  onClose={handleFeedbackClose}
-                />
-              </Col>
-            </Row>
-          </div>
-        ) : (
-          <div className="success-container" style={{ padding: "50px 0" }}>
-            <Row justify="center" gutter={[24, 24]}>
-              <Col xs={24} lg={16}>
-                <Result
-                  status="success"
-                  title="Your car booking was successful!"
-                  subTitle={`Transaction ID: ${currentBooking?.transactionId}. You have booked ${car.name} from ${from} to ${to}.`}
-                  extra={[
-                    <Button
-                      key="bookings"
-                      type="primary"
-                      onClick={handleViewBookings}
-                      style={{
-                        background: "slateblue",
-                        borderColor: "slateblue",
-                      }}
-                    >
-                      View My Bookings
-                    </Button>,
-                    <Button
-                      key="feedback"
-                      onClick={handleGiveFeedback}
-                      icon={<StarOutlined />}
-                    >
-                      Give Feedback
-                    </Button>,
-                  ]}
-                />
-              </Col>
-            </Row>
-          </div>
-        )}
-      </DefaultLayout>
-    );
+    dispatch(bookCar(reqObj));
   }
 
   return (
@@ -259,11 +194,11 @@ function BookingCar() {
                         <Descriptions layout="vertical" column={2} bordered>
                           <Descriptions.Item
                             label={
-                              <span>
-                                <DollarOutlined /> Rent Per Hour
-                              </span>
+                              <div>
+                                <DollarOutlined style={{ border: "none" }} />{" "}
+                                Rent Per Hour
+                              </div>
                             }
-                            span={1}
                           >
                             <Tag color="green" style={{ fontSize: "16px" }}>
                               ₹{car.rentPerHour}
@@ -271,21 +206,33 @@ function BookingCar() {
                           </Descriptions.Item>
                           <Descriptions.Item
                             label={
-                              <span>
-                                <UserOutlined /> Capacity
-                              </span>
+                              <div>
+                                <CarOutlined style={{ border: "none" }} /> Free
+                                Kilometers
+                              </div>
                             }
-                            span={1}
+                          >
+                            {car.freeKilometers}
+                          </Descriptions.Item>
+                          <Descriptions.Item
+                            label={
+                              <div>
+                                <UserOutlined style={{ border: "none" }} />{" "}
+                                Capacity
+                              </div>
+                            }
                           >
                             <Tag color="blue">{car.capacity} Persons</Tag>
                           </Descriptions.Item>
                           <Descriptions.Item
                             label={
-                              <span>
-                                <EnvironmentOutlined /> Fuel Type
-                              </span>
+                              <div>
+                                <ClockCircleOutlined
+                                  style={{ border: "none" }}
+                                />{" "}
+                                Fuel Type
+                              </div>
                             }
-                            span={2}
                           >
                             <Tag color="volcano">{car.fuelType}</Tag>
                           </Descriptions.Item>
@@ -330,7 +277,7 @@ function BookingCar() {
                                 }}
                                 style={{ marginBottom: "15px" }}
                               >
-                                <Text strong>Include Driver (+₹30/hr)</Text>
+                                <Text strong>Include Driver (+$30/hr)</Text>
                               </Checkbox>
 
                               <Divider style={{ margin: "15px 0" }} />
@@ -356,7 +303,11 @@ function BookingCar() {
                                   <Button
                                     type="primary"
                                     size="large"
-                                    icon={<CreditCardOutlined />}
+                                    icon={
+                                      <CreditCardOutlined
+                                        style={{ border: "none" }}
+                                      />
+                                    }
                                     block
                                     onClick={() => setShowPayment(true)}
                                     style={{
@@ -401,6 +352,10 @@ function BookingCar() {
               </Card>
             )}
           </Col>
+        </Row>
+
+        <Row gutter={[16, 16]} style={{ marginTop: "20px" }}>
+          {/* Customer reviews have been removed */}
         </Row>
       </div>
 
@@ -451,6 +406,7 @@ function BookingCar() {
                             fontSize: "18px",
                             marginRight: "10px",
                             color: "#f5222d",
+                            border: "none",
                           }}
                         />
                         <div>
@@ -464,6 +420,7 @@ function BookingCar() {
                             fontSize: "18px",
                             marginRight: "10px",
                             color: "#f5222d",
+                            border: "none",
                           }}
                         />
                         <div>
@@ -478,6 +435,77 @@ function BookingCar() {
             )}
           </div>
         </Modal>
+      )}
+
+      {showRating && (
+        <div style={{ marginTop: 20 }}>
+          <h3>
+            <StarOutlined style={{ color: "#faad14", border: "none" }} /> Rating
+            & Reviews
+          </h3>
+          <Row gutter={16}>
+            <Col lg={6}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <Rate
+                  disabled
+                  value={car.averageRating || 0}
+                  style={{ border: "none" }}
+                />
+                <h2>{car.averageRating || "No ratings yet"}</h2>
+                <p>{car.totalRatings || 0} reviews</p>
+              </div>
+            </Col>
+            <Col lg={18}>
+              {car.ratings && car.ratings.length > 0 ? (
+                <List
+                  itemLayout="horizontal"
+                  dataSource={car.ratings}
+                  renderItem={(rating) => (
+                    <List.Item>
+                      <List.Item.Meta
+                        avatar={
+                          <Avatar
+                            style={{ background: "#1890ff", border: "none" }}
+                            icon={<UserOutlined style={{ border: "none" }} />}
+                          />
+                        }
+                        title={
+                          <span>
+                            <Rate
+                              disabled
+                              value={rating.rating}
+                              style={{ border: "none" }}
+                            />{" "}
+                            {rating.user
+                              ? rating.user.username
+                              : "Anonymous User"}
+                          </span>
+                        }
+                        description={
+                          <>
+                            <p>{rating.comment}</p>
+                            <small>
+                              <ClockCircleOutlined style={{ border: "none" }} />{" "}
+                              {new Date(rating.createdAt).toLocaleDateString()}
+                            </small>
+                          </>
+                        }
+                      />
+                    </List.Item>
+                  )}
+                />
+              ) : (
+                <Empty description="No reviews yet" />
+              )}
+            </Col>
+          </Row>
+        </div>
       )}
     </DefaultLayout>
   );

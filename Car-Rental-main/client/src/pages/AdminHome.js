@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import DefaultLayout from "../components/DefaultLayout";
 import { deleteCar, getAllCars } from "../redux/actions/carsActions";
 import { getAllBookings } from "../redux/actions/bookingActions";
@@ -48,6 +49,7 @@ function AdminHome() {
   const [filteredCars, setFilteredCars] = useState([]);
   const [activeTab, setActiveTab] = useState("1");
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
@@ -66,6 +68,10 @@ function AdminHome() {
     setFilteredCars(filtered);
   };
 
+  const handleDelete = (carId) => {
+    dispatch(deleteCar({ carid: carId }));
+  };
+
   const getPaymentStatus = (booking) => {
     return booking.transactionId
       ? { text: "Paid", color: "green", icon: <CheckCircleOutlined /> }
@@ -78,7 +84,10 @@ function AdminHome() {
       dataIndex: ["car", "name"],
       render: (text, record) => (
         <div className="flex items-center">
-          <Avatar src={record.car?.image} icon={<CarOutlined />} />
+          <Avatar
+            src={record.car?.image}
+            icon={<CarOutlined style={{ border: "none" }} />}
+          />
           <span className="ml-2">{record.car?.name || "Unknown"}</span>
         </div>
       ),
@@ -173,7 +182,10 @@ function AdminHome() {
               prefix={<SearchOutlined />}
             />
             <Link to="/addcar">
-              <Button type="primary" icon={<PlusOutlined />}>
+              <Button
+                type="primary"
+                icon={<PlusOutlined style={{ border: "none" }} />}
+              >
                 Add Car
               </Button>
             </Link>
@@ -184,25 +196,20 @@ function AdminHome() {
                 <Card hoverable cover={<img alt={car.name} src={car.image} />}>
                   <h3>{car.name}</h3>
                   <Tag color="blue">${car.rentPerHour}/hr</Tag>
-                  <div className="mt-2">
+                  <div className="mt-2 action-btns">
                     <Tooltip title="Edit">
-                      <Link to={`/editcar/${car._id}`}>
-                        <Button icon={<EditOutlined />} />
-                      </Link>
+                      <EditOutlined
+                        className="action-icon"
+                        style={{ border: "none" }}
+                        onClick={() => navigate(`/editcar/${car._id}`)}
+                      />
                     </Tooltip>
                     <Tooltip title="Delete">
-                      <Popconfirm
-                        title="Delete this car?"
-                        onConfirm={() =>
-                          dispatch(deleteCar({ carid: car._id }))
-                        }
-                      >
-                        <Button
-                          icon={<DeleteOutlined />}
-                          danger
-                          className="ml-2"
-                        />
-                      </Popconfirm>
+                      <DeleteOutlined
+                        className="action-icon"
+                        style={{ border: "none", color: "red" }}
+                        onClick={() => handleDelete(car._id)}
+                      />
                     </Tooltip>
                   </div>
                 </Card>
